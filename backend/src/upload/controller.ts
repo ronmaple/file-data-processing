@@ -1,16 +1,26 @@
 import fs from 'fs'
 import pdfParse from 'pdf-parse'
 
-export const upload = (req: any, res: any) => {
+// TODO: proper design pattern
+// TODO: global error handler
+export const pdfExtract = async (pathToFile: string) => {
+  if (!pathToFile)  {
+    throw new Error('No path to file')
+  }
+  console.log(__dirname)
+  let dataBuffer = fs.readFileSync(__dirname + '/' + pathToFile)
+  console.log(dataBuffer)
+  const data = await pdfParse(dataBuffer)
+  console.log(data)
+}
+export const upload = async (req: any, res: any) => {
   console.log('---- Upload  ----')
   console.log(req.body)
   console.log(req.file)
   // TODO maybe to s3 or something
   const pathToFile = `public/data/uploads/${req.file.fieldname}-${req.file.originalname}`
-  let dataBuffer = fs.readFileSync(pathToFile)
-  pdfParse(dataBuffer).then(function(data) {
-    console.log(data)
-  })
+  await pdfExtract(pathToFile)
+
   res.json('OK')
 }
 
